@@ -8,6 +8,13 @@ const routes = require("./routes");
 app.use(express.json());
 app.use(routes);
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: "6497579c68d1e9208c200f86",
+  };
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(`App is listening at port ${PORT}`);
 });
