@@ -3,14 +3,14 @@ const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 // Error Handling
 
-function catchErrorHandler(res, e) {
-  if (e.name === "ValidationError" || e.name === "AssertionError") {
+function catchErrorHandler(res, error) {
+  if (error.name === "ValidationError" || error.name === "AssertionError") {
     return res.status(ERROR_400).send({
       message:
         "Invalid data passed to params or invalid data passed to methods for creating item",
     });
   }
-  if (e.name === "CastError") {
+  if (error.name === "CastError") {
     return res.status(ERROR_400).send({
       message:
         "No user with that ID or request was send to non existent address",
@@ -18,7 +18,7 @@ function catchErrorHandler(res, e) {
   }
   return res.status(ERROR_500).send({
     message: "Error has occurred on server",
-    e,
+    error,
   });
 }
 
@@ -27,8 +27,8 @@ function catchErrorHandler(res, e) {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((e) => {
-      catchErrorHandler(res, e);
+    .catch((error) => {
+      catchErrorHandler(res, error);
     });
 };
 
@@ -38,17 +38,17 @@ const getUser = (req, res) => {
   User.findById(userId)
     .orFail()
     .then((user) => res.status(200).send({ data: user }))
-    .catch((e) => {
-      if (e.name === "DocumentNotFound") {
+    .catch((error) => {
+      if (error.name === "DocumentNotFound") {
         return res.status(ERROR_404).send({
           message:
             "No user with that ID or request was send to non existent address",
         });
       }
       if (
-        e.name === "CastError" ||
-        e.name === "ValidationError" ||
-        e.name === "AssertionError"
+        error.name === "CastError" ||
+        error.name === "ValidationError" ||
+        error.name === "AssertionError"
       ) {
         return res.status(ERROR_400).send({
           message:
@@ -57,7 +57,7 @@ const getUser = (req, res) => {
       }
       return res.status(ERROR_500).send({
         message: "Error has occurred on server",
-        e,
+        error,
       });
     });
 };
@@ -71,8 +71,8 @@ const createUser = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((e) => {
-      catchErrorHandler(res, e);
+    .catch((error) => {
+      catchErrorHandler(res, error);
     });
 };
 

@@ -4,14 +4,14 @@ const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 //Error Handling
 
-function handleError(res, e) {
-  if (e.name === "ValidationError" || e.name === "AssertionError") {
+function handleError(res, error) {
+  if (error.name === "ValidationError" || error.name === "AssertionError") {
     return res.status(ERROR_400).send({
       message:
         "Invalid data passed to params or invalid data passed to methods for creating item",
     });
   }
-  if (e.name === "CastError") {
+  if (error.name === "CastError") {
     return res.status(ERROR_400).send({
       message:
         "No clothing item with that ID or request was send to non existent address",
@@ -19,22 +19,22 @@ function handleError(res, e) {
   }
   return res.status(ERROR_500).send({
     message: "Error has occurred on server",
-    e,
+    error,
   });
 }
 
-function handleFindIdError(req, res, e) {
+function handleFindIdError(req, res, error) {
   if (
-    e.name === "CastError" ||
-    e.name === "ValidationError" ||
-    e.name === "AssertionError"
+    error.name === "CastError" ||
+    error.name === "ValidationError" ||
+    error.name === "AssertionError"
   ) {
     return res.status(ERROR_400).send({
       message:
         "Invalid data passed to params or invalid data passed to methods for creating item",
     });
   }
-  if (e.name === "DocumentNotFoundError") {
+  if (error.name === "DocumentNotFoundError") {
     return res.status(ERROR_404).send({
       message:
         "No clothing item with that ID or request was send to non existent address",
@@ -42,7 +42,7 @@ function handleFindIdError(req, res, e) {
   }
   return res
     .status(ERROR_500)
-    .send({ message: "Error has occurred on server", e });
+    .send({ message: "Error has occurred on server", error });
 }
 
 const createItem = (req, res) => {
@@ -52,16 +52,16 @@ const createItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch((e) => {
-      handleError(req, res, e);
+    .catch((error) => {
+      handleError(req, res, error);
     });
 };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((e) => {
-      handleError(req, res, e);
+    .catch((error) => {
+      handleError(req, res, error);
     });
 };
 
@@ -72,8 +72,8 @@ const updateItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from updateItem", e });
+    .catch((error) => {
+      res.status(500).send({ message: "Error from updateItem", error });
     });
 };
 
@@ -83,8 +83,8 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({}))
-    .catch((e) => {
-      handleFindIdError(req, res, e);
+    .catch((error) => {
+      handleFindIdError(req, res, error);
     });
 };
 
@@ -98,8 +98,8 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then(() => res.status(200).send({ message: "Successfully liked item" }))
-    .catch((e) => {
-      handleFindIdError(req, res, e);
+    .catch((error) => {
+      handleFindIdError(req, res, error);
     });
 };
 
@@ -111,8 +111,8 @@ function dislikeItem(req, res) {
   )
     .orFail()
     .then(() => res.status(200).send({ data: item }))
-    .catch((e) => {
-      handleFindIdError(req, res, e);
+    .catch((error) => {
+      handleFindIdError(req, res, error);
     });
 }
 
