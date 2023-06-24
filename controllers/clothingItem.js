@@ -46,14 +46,10 @@ function handleFindIdError(req, res, e) {
 }
 
 const createItem = (req, res) => {
-  console.log(req);
-  console.log(req.body);
-
   const { name, weather, imageURL } = req.body;
 
   ClothingItem.create({ name, weather, imageURL })
     .then((item) => {
-      console.log(item);
       res.send({ data: item });
     })
     .catch((e) => {
@@ -72,7 +68,7 @@ const getItems = (req, res) => {
 const updateItem = (req, res) => {
   const { itemId } = req.params;
   const { imageURL } = req.body;
-  console.log(itemId, imageURL);
+
   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
@@ -84,7 +80,6 @@ const updateItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  console.log(itemId);
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({}))
