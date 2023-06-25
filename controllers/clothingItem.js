@@ -4,7 +4,7 @@ const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 //Error Handling
 
-function handleError(res, error) {
+function handleError(req, res, error) {
   if (error.name === "ValidationError" || error.name === "AssertionError") {
     return res.status(ERROR_400).send({
       message:
@@ -46,9 +46,9 @@ function handleFindIdError(req, res, error) {
 }
 
 const createItem = (req, res) => {
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageURL })
+  ClothingItem.create({ name, weather, imageUrl })
     .then((item) => {
       res.send({ data: item });
     })
@@ -67,9 +67,9 @@ const getItems = (req, res) => {
 
 const updateItem = (req, res) => {
   const { itemId } = req.params;
-  const { imageURL } = req.body;
+  const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((error) => {
