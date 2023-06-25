@@ -1,7 +1,6 @@
 const User = require("../models/users");
-const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
-// Error Handling
+const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 function catchErrorHandler(res, error) {
   if (error.name === "ValidationError" || error.name === "AssertionError") {
@@ -22,8 +21,6 @@ function catchErrorHandler(res, error) {
   });
 }
 
-// get users
-
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -32,12 +29,11 @@ const getUsers = (req, res) => {
     });
 };
 
-//get USER
 const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(404).send({ data: user }))
     .catch((error) => {
       if (error.name === "DocumentNotFound") {
         return res.status(ERROR_404).send({
@@ -61,8 +57,6 @@ const getUser = (req, res) => {
       });
     });
 };
-
-// create user
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
