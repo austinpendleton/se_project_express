@@ -2,8 +2,6 @@ const ClothingItem = require("../models/clothingItem");
 
 const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
-//Error Handling
-
 function handleError(req, res, error) {
   if (error.name === "ValidationError" || error.name === "AssertionError") {
     return res.status(ERROR_400).send({
@@ -82,18 +80,16 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(204).send({}))
+    .then(() => res.status(200).send({ message: "Successfully deleted" }))
     .catch((error) => {
       handleFindIdError(req, res, error);
     });
 };
 
-//Likes
-
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user_.id } },
+    { $addToSet: { likes: req.user.id } },
     { new: true }
   )
     .orFail()
