@@ -15,33 +15,39 @@ function handleError(req, res, error) {
         "No clothing item with that ID or request was send to non existent address",
     });
   }
-  return res.status(ERROR_500).send({
-    message: "Error has occurred on server",
-    error,
-  });
-}
-
-function handleFindIdError(req, res, error) {
-  if (
-    error.name === "CastError" ||
-    error.name === "ValidationError" ||
-    error.name === "AssertionError"
-  ) {
-    return res.status(ERROR_400).send({
-      message:
-        "Invalid data passed to params or invalid data passed to methods for creating item",
-    });
-  }
   if (error.name === "DocumentNotFoundError") {
     return res.status(ERROR_404).send({
       message:
         "No clothing item with that ID or request was send to non existent address",
     });
   }
-  return res
-    .status(ERROR_500)
-    .send({ message: "Error has occurred on server", error });
+  return res.status(ERROR_500).send({
+    message: "Error has occurred on server",
+    error,
+  });
 }
+
+// function handleFindIdError(req, res, error) {
+//   if (
+//     error.name === "CastError" ||
+//     error.name === "ValidationError" ||
+//     error.name === "AssertionError"
+//   ) {
+//     return res.status(ERROR_400).send({
+//       message:
+//         "Invalid data passed to params or invalid data passed to methods for creating item",
+//     });
+//   }
+//   if (error.name === "DocumentNotFoundError") {
+//     return res.status(ERROR_404).send({
+//       message:
+//         "No clothing item with that ID or request was send to non existent address",
+//     });
+//   }
+//   return res
+//     .status(ERROR_500)
+//     .send({ message: "Error has occurred on server", error });
+// }
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -82,20 +88,20 @@ const deleteItem = (req, res) => {
     .orFail()
     .then(() => res.status(200).send({ message: "Successfully deleted" }))
     .catch((error) => {
-      handleFindIdError(req, res, error);
+      handleError(req, res, error);
     });
 };
 
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user.id } },
+    { $addToSet: { likes: req.user._id } },
     { new: true }
   )
     .orFail()
     .then(() => res.status(200).send({ message: "Successfully liked item" }))
     .catch((error) => {
-      handleFindIdError(req, res, error);
+      handleError(req, res, error);
     });
 };
 
@@ -106,9 +112,9 @@ function dislikeItem(req, res) {
     { new: true }
   )
     .orFail()
-    .then(() => res.status(200).send({ data: item }))
+    .then(() => res.status(200).send({ message: "Resource not found" }))
     .catch((error) => {
-      handleFindIdError(req, res, error);
+      handleError(req, res, error);
     });
 }
 

@@ -35,26 +35,7 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.status(404).send({ data: user }))
     .catch((error) => {
-      if (error.name === "DocumentNotFound") {
-        return res.status(ERROR_404).send({
-          message:
-            "No user with that ID or request was send to non existent address",
-        });
-      }
-      if (
-        error.name === "CastError" ||
-        error.name === "ValidationError" ||
-        error.name === "AssertionError"
-      ) {
-        return res.status(ERROR_400).send({
-          message:
-            "Invalid data passed to params or invalid data passed to methods for creating item",
-        });
-      }
-      return res.status(ERROR_500).send({
-        message: "Error has occurred on server",
-        error,
-      });
+      catchErrorHandler(res, error);
     });
 };
 
