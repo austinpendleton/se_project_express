@@ -10,7 +10,7 @@ function catchErrorHandler(res, error) {
     });
   }
   if (error.name === "CastError") {
-    return res.status(ERROR_400).send({
+    return res.status(ERROR_404).send({
       message:
         "No user with that ID or request was send to non existent address",
     });
