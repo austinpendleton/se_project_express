@@ -1,58 +1,11 @@
 const ClothingItem = require("../models/clothingItem");
 
-const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
-
-function handleError(req, res, error) {
-  if (error.name === "ValidationError" || error.name === "AssertionError") {
-    return res.status(ERROR_400).send({
-      message:
-        "Invalid data passed to params or invalid data passed to methods for creating item",
-    });
-  }
-  if (error.name === "CastError") {
-    return res.status(ERROR_400).send({
-      message:
-        "No clothing item with that ID or request was send to non existent address",
-    });
-  }
-  if (error.name === "DocumentNotFoundError") {
-    return res.status(ERROR_404).send({
-      message:
-        "No clothing item with that ID or request was send to non existent address",
-    });
-  }
-  return res.status(ERROR_500).send({
-    message: "Error has occurred on server",
-    error,
-  });
-}
-
-// function handleFindIdError(req, res, error) {
-//   if (
-//     error.name === "CastError" ||
-//     error.name === "ValidationError" ||
-//     error.name === "AssertionError"
-//   ) {
-//     return res.status(ERROR_400).send({
-//       message:
-//         "Invalid data passed to params or invalid data passed to methods for creating item",
-//     });
-//   }
-//   if (error.name === "DocumentNotFoundError") {
-//     return res.status(ERROR_404).send({
-//       message:
-//         "No clothing item with that ID or request was send to non existent address",
-//     });
-//   }
-//   return res
-//     .status(ERROR_500)
-//     .send({ message: "Error has occurred on server", error });
-// }
+const { handleError } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
@@ -77,7 +30,7 @@ const updateItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((error) => {
-      res.status(500).send({ message: "Error from updateItem", error });
+      handleError(req, res, error);
     });
 };
 
@@ -112,7 +65,9 @@ function dislikeItem(req, res) {
     { new: true }
   )
     .orFail()
-    .then(() => res.status(200).send({ message: "Resource not found" }))
+    .then(() =>
+      res.status(200).send({ message: "Item was successfully disliked" })
+    )
     .catch((error) => {
       handleError(req, res, error);
     });
