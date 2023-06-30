@@ -6,7 +6,7 @@ const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((error) => {
-      handleError(res, error);
+      handleError(req, res, error);
     });
 };
 
@@ -16,7 +16,7 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.status(200).send({ data: user }))
     .catch((error) => {
-      handleError(res, error);
+      handleError(req, res, error);
     });
 };
 
@@ -28,7 +28,7 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((error) => {
-      handleError(res, error);
+      handleError(req, res, error);
     });
 };
 
