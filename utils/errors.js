@@ -1,5 +1,8 @@
 const ERROR_400 = 400;
+const ERROR_401 = 401;
+const ERROR_403 = 403;
 const ERROR_404 = 404;
+const ERROR_11000 = 11000;
 const ERROR_500 = 500;
 
 function handleError(req, res, error) {
@@ -14,10 +17,25 @@ function handleError(req, res, error) {
       message: "Invalid item ID",
     });
   }
+  if (error.name === "UnauthorizedError") {
+    return res.status(ERROR_401).send({
+      message: "Email or password not found",
+    });
+  }
+  if (error.name === "ForbiddenError") {
+    return res.status(ERROR_403).send({
+      message: "Email or password not found",
+    });
+  }
   if (error.name === "DocumentNotFoundError") {
     return res.status(ERROR_404).send({
       message:
         "No clothing item with that ID or request was send to non existent address",
+    });
+  }
+  if (error.name === "ConflictError") {
+    return res.status(ERROR_11000).send({
+      message: "Email already in database",
     });
   }
   return res.status(ERROR_500).send({
@@ -28,7 +46,10 @@ function handleError(req, res, error) {
 
 module.exports = {
   ERROR_400,
+  ERROR_401,
+  ERROR_403,
   ERROR_404,
+  ERROR_11000,
   ERROR_500,
   handleError,
 };
