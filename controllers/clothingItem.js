@@ -22,24 +22,23 @@ const getItems = (req, res) => {
     });
 };
 
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((error) => {
-      handleError(req, res, error);
-    });
-};
-
 const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-
-  ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
-    .then(() => res.status(200).send({ message: "Successfully deleted" }))
+  ClothingItem.findById(req.params._id)
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = 404;
+      throw error;
+    })
+    .then((item) => {
+      if (String(item.owner) !== req.user._id) {
+        return res
+          .status(403)
+          .send({ message: "You are not authorized to delte this item" });
+      }
+      return item.deleteOne().then(() => {
+        res.send({ message: "Item deleted" });
+      });
+    })
     .catch((error) => {
       handleError(req, res, error);
     });
@@ -76,7 +75,6 @@ function dislikeItem(req, res) {
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,

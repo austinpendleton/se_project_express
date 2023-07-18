@@ -4,23 +4,6 @@ const User = require("../models/users");
 const { JWT_SECRET } = require("../utils/config");
 const { handleError } = require("../utils/errors");
 
-// const getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => res.status(200).send(users))
-//     .catch((error) => {
-//       handleError(req, res, error);
-//     });
-// };
-
-// const getUser = (req, res) => {
-//   const { userId } = req.params;
-//   User.findById(userId)
-//     .orFail()
-//     .then((user) => res.status(200).send({ data: user }))
-//     .catch((error) => {
-//       handleError(req, res, error);
-//     });
-// };
 const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
@@ -30,7 +13,7 @@ const updateProfile = (req, res) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => {
+    .then((user, error) => {
       if (!user) {
         handleError(req, res, error);
       }
@@ -59,8 +42,9 @@ const createUser = (req, res) => {
     .hash(password, 10)
     .then((hash) => User.create({ email, password: hash, name, avatar }))
     .then((user) => {
-      const userData = user.toObject();
-      res.status(201).send({ data: userData });
+      res.status(201).send({
+        data: { name: user.name, avatar: user.avatar, email: user.email },
+      });
     })
     .catch((error) => {
       handleError(req, res, error);
