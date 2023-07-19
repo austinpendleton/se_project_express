@@ -23,11 +23,6 @@ function handleError(req, res, error) {
       message: "Email or password not found",
     });
   }
-  if (error.name === "ForbiddenError") {
-    return res.status(ERROR_403).send({
-      message: "Email or password not found",
-    });
-  }
   if (error.name === "DocumentNotFoundError") {
     return res.status(ERROR_404).send({
       message:

@@ -1,6 +1,6 @@
 const ClothingItem = require("../models/clothingItem");
 
-const { handleError } = require("../utils/errors");
+const { handleError, ERROR_403 } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -23,16 +23,12 @@ const getItems = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  ClothingItem.findById(req.params._id)
-    .orFail(() => {
-      const error = new Error("Item ID not found");
-      error.statusCode = 404;
-      throw error;
-    })
+  ClothingItem.findById(req.params.itemId)
+    .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
         return res
-          .status(403)
+          .status(ERROR_403)
           .send({ message: "You are not authorized to delte this item" });
       }
       return item.deleteOne().then(() => {
