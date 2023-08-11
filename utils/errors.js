@@ -7,6 +7,7 @@ const ERROR_11000 = 11000;
 const ERROR_500 = 500;
 
 function handleError(req, res, error) {
+  console.error(error);
   if (error.name === "ValidationError") {
     return res.status(ERROR_400).send({
       message:

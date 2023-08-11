@@ -3,9 +3,9 @@ const ClothingItem = require("../models/clothingItem");
 const { handleError, ERROR_403 } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
+  const { name, weather, imageURL } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+  ClothingItem.create({ name, weather, imageURL, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
