@@ -3,9 +3,9 @@ const ClothingItem = require("../models/clothingItem");
 const { handleError, ERROR_403 } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageURL, owner: req.user._id })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
@@ -47,7 +47,8 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then(() => res.status(200).send({ message: "Successfully liked item" }))
+
+    .then((item) => res.status(200).send(item))
     .catch((error) => {
       handleError(req, res, error);
     });
@@ -60,9 +61,7 @@ function dislikeItem(req, res) {
     { new: true }
   )
     .orFail()
-    .then(() =>
-      res.status(200).send({ message: "Item was successfully disliked" })
-    )
+    .then((item) => res.status(200).send(item))
     .catch((error) => {
       handleError(req, res, error);
     });
