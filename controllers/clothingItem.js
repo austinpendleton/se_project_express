@@ -1,8 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
+const { BadRequestError } = require("../errors/bad-request-error");
+const { NotFoundError } = require("../errors/not-found-error");
+const { ForbiddenError } = require("../errors/forbidden-error");
 
-const { handleError, ERROR_403 } = require("../utils/errors");
-
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -10,33 +11,36 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch((error) => {
-      handleError(req, res, error);
+      if (error.name === "ValidationError") {
+        next(new BadRequestError("Invalid data"));
+      } else {
+        next(error);
+      }
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   ClothingItem.findById(req.params.itemId)
-    .orFail()
+    .orFail(() => new NotFoundError("Not Found"))
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res
-          .status(ERROR_403)
-          .send({ message: "You are not authorized to delte this item" });
+        const error = new ForbiddenError("User Not Found");
+        throw error;
       }
       return item.deleteOne().then(() => {
         res.send({ message: "Item deleted" });
       });
     })
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 };
 
@@ -46,24 +50,23 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail()
-
+    .orFail(() => new NotFoundError("Not Found"))
     .then((item) => res.status(200).send(item))
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 };
 
-function dislikeItem(req, res) {
+function dislikeItem(req, res, next) {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail()
+    .orFail(() => new NotFoundError("Not Found"))
     .then((item) => res.status(200).send(item))
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 }
 

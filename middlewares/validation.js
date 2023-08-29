@@ -19,7 +19,7 @@ const clothingItemValidation = celebrate({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid url',
     }),
-    weather: Joi.string().required.valid("hot", "warm", "cold"),
+    weather: Joi.string().required().valid("hot", "warm", "cold"),
   }),
 });
 
@@ -38,7 +38,7 @@ const userInfoValidation = celebrate({
       "string.empty": 'The "email" field must be filled in',
       "string.email": 'The "email" field must be a valid email',
     }),
-    password: Joi.string().required.messages({
+    password: Joi.string().required().messages({
       "string.empty": 'The "password" field must be filled in',
     }),
   }),
@@ -50,7 +50,7 @@ const logInValidation = celebrate({
       "string.empty": 'The "email" field must be filled in',
       "string.email": 'The "email" field must be a valid email',
     }),
-    password: Joi.string().required.messages({
+    password: Joi.string().required().messages({
       "string.empty": 'The "password" field must be filled in',
     }),
   }),

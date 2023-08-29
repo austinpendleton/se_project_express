@@ -2,9 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const { JWT_SECRET } = require("../utils/config");
-const { handleError } = require("../utils/errors");
+const { BadRequestError } = require("../errors/bad-request-error");
+const { NotFoundError } = require("../errors/not-found-error");
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
 
@@ -15,27 +16,32 @@ const updateProfile = (req, res) => {
   )
     .then((user, error) => {
       if (!user) {
-        handleError(req, res, error);
+        const error = new NotFoundError("Not Found");
+        throw error;
       }
       res.send({ data: user });
     })
     .catch((error) => {
-      handleError(req, res, error);
+      if (error.name === "ValidationError") {
+        next(new BadRequestError("Invalid data"));
+      } else {
+        next(error);
+      }
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .orFail()
+    .orFail(() => new NotFoundError("Not Found"))
     .then((user) => res.send({ data: user }))
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   bcrypt
@@ -47,11 +53,15 @@ const createUser = (req, res) => {
       });
     })
     .catch((error) => {
-      handleError(req, res, error);
+      if (error.name === "ValidationError") {
+        next(new BadRequestError("Invalid data"));
+      } else {
+        next(error);
+      }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
@@ -62,7 +72,7 @@ const login = (req, res) => {
       res.send({ token, mesage: "Here is the token" });
     })
     .catch((error) => {
-      handleError(req, res, error);
+      next(error);
     });
 };
 
