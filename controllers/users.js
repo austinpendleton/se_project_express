@@ -4,6 +4,7 @@ const User = require("../models/users");
 const { JWT_SECRET } = require("../utils/config");
 const { BadRequestError } = require("../errors/bad-request-error");
 const { NotFoundError } = require("../errors/not-found-error");
+const { ConflictError } = require("../errors/conflict-error");
 
 const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
@@ -14,7 +15,7 @@ const updateProfile = (req, res, next) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .then((user, error) => {
+    .then((user) => {
       if (!user) {
         const error = new NotFoundError("Not Found");
         throw error;
@@ -53,8 +54,8 @@ const createUser = (req, res, next) => {
       });
     })
     .catch((error) => {
-      if (error.name === "ValidationError") {
-        next(new BadRequestError("Invalid data"));
+      if (error.code === 11000) {
+        next(new ConflictError("Duplicate email error"));
       } else {
         next(error);
       }

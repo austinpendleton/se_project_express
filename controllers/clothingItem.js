@@ -11,7 +11,11 @@ const createItem = (req, res, next) => {
       res.send({ data: item });
     })
     .catch((error) => {
-      next(error);
+      if (error.name === "ValidationError") {
+        next(new BadRequestError("Invalid data"));
+      } else {
+        next(error);
+      }
     });
 };
 
@@ -19,11 +23,7 @@ const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch((error) => {
-      if (error.name === "ValidationError") {
-        next(new BadRequestError("Invalid data"));
-      } else {
-        next(error);
-      }
+      next(error);
     });
 };
 
@@ -44,7 +44,7 @@ const deleteItem = (req, res, next) => {
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },

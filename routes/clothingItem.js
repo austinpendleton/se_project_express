@@ -14,9 +14,11 @@ const {
   clothingItemValidation,
 } = require("../middlewares/validation");
 
-router.post("/", clothingItemValidation, createItem);
-
 router.get("/", getItems);
+
+router.use(auth);
+
+router.post("/", clothingItemValidation, createItem);
 
 router.put("/:itemId/likes", idValidation, likeItem);
 
