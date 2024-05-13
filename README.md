@@ -12,6 +12,4 @@ In future updates we plan to create a server with an API and user authorization.
 
 This back-end project was tested using MongoDB and Postman throughout the development.
 
-**Domain Name**
 
-wtwr.netlord.de
