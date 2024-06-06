@@ -1,6 +1,6 @@
 # WTWR (What to Wear?): Back End
 
-The back-end project is focused on creating a server for the WTWR application. This is the first oppurtunity we had to work with databases and deploy applications on a remote machine. We have included routes for both a users section and a clothing items section for our app. We created schemas and incorporated error handling throughout our controllers to improve user/dev experience throughtout this process.
+The back-end project is focused on creating a server for the WTWR application. This is the first oppurtunity we had to work with databases and deploy applications on a remote machine. We have included routes for both a users section and a clothing items section for our app. We created schemas and incorporated error handling throughout our controllers to improve user/dev experience throughout this process.
 
 In future updates we plan to create a server with an API and user authorization.
 
